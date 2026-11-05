@@ -1,0 +1,379 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --text: #1b1b1b;
+  --muted: #3a3a3a;
+  --border: #c5c5c5;
+  --surface: #f4f6f8;
+  --link: #0b3f91;
+  --focus: #0b57d0;
+  --scheduled: #1b1b1b;
+  --scheduled-bg: #ececec;
+  --live: #0d4f28;
+  --live-bg: #e5f6eb;
+  --finalizing: #5c3d00;
+  --finalizing-bg: #fff4d6;
+  --final: #0b3a75;
+  --final-bg: #e7f0fb;
+  --stale: #6b2d0b;
+  --stale-bg: #fde8dc;
+  --unavailable: #7f1d1d;
+  --unavailable-bg: #fde8e8;
+  --row: #f7f8fa;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121417;
+    --text: #f3f4f6;
+    --muted: #d5d8de;
+    --border: #5b6472;
+    --surface: #1c2128;
+    --link: #9dc1ff;
+    --focus: #8eb6ff;
+    --scheduled: #f3f4f6;
+    --scheduled-bg: #2a3038;
+    --live: #b7f0cb;
+    --live-bg: #123524;
+    --finalizing: #ffe2a3;
+    --finalizing-bg: #3a2d0d;
+    --final: #c5dcff;
+    --final-bg: #15283f;
+    --stale: #ffd0b8;
+    --stale-bg: #3d2418;
+    --unavailable: #ffc9c9;
+    --unavailable-bg: #3f1d1d;
+    --row: #1a1f26;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  transform: translateY(-200%);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  z-index: 20;
+  border: 2px solid var(--focus);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.site-header,
+.contest-app,
+.site-footer,
+.contest-statement {
+  width: min(72rem, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.site-header {
+  padding-top: 1.5rem;
+}
+
+.site-header h1 {
+  margin: 0.25rem 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.2;
+}
+
+.archive-link {
+  margin: 0;
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.contest-statement {
+  max-width: 42rem;
+  margin-top: 1.5rem;
+}
+
+.contest-statement :is(h2, h3) {
+  line-height: 1.3;
+  margin-top: 1.6rem;
+}
+
+.contest-statement pre {
+  overflow-x: auto;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border-radius: 0.5rem;
+}
+
+.contest-statement code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.contest-app {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.contest-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.contest-heading,
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+}
+
+.contest-kicker {
+  margin: 0;
+  font-weight: 700;
+}
+
+.badge {
+  margin: 0;
+  display: inline-block;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-scheduled {
+  color: var(--scheduled);
+  background: var(--scheduled-bg);
+}
+
+.badge-live {
+  color: var(--live);
+  background: var(--live-bg);
+}
+
+.badge-finalizing {
+  color: var(--finalizing);
+  background: var(--finalizing-bg);
+}
+
+.badge-final {
+  color: var(--final);
+  background: var(--final-bg);
+}
+
+.badge-stale {
+  color: var(--stale);
+  background: var(--stale-bg);
+}
+
+.badge-unavailable {
+  color: var(--unavailable);
+  background: var(--unavailable-bg);
+}
+
+.countdown,
+.status-line,
+.contest-window {
+  margin: 0;
+}
+
+.status-line {
+  font-size: 1.05rem;
+}
+
+.contest-window,
+.meta-list,
+.tie-break,
+.competitor-id,
+.comp-meta {
+  color: var(--muted);
+}
+
+.meta-list,
+.warning-list,
+.error-list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.notice {
+  margin: 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-left-width: 0.35rem;
+  background: var(--surface);
+}
+
+.notice-stale {
+  border-left-color: var(--stale);
+}
+
+.notice-outage,
+.notice-info {
+  border-left-color: var(--finalizing);
+}
+
+.standings-title {
+  margin: 0.5rem 0 0;
+  font-size: 1.3rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--bg);
+}
+
+.standings {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 44rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.standings caption {
+  caption-side: bottom;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+}
+
+.standings th,
+.standings td {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+
+.standings thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface);
+}
+
+.standings tbody tr:nth-child(even) {
+  background: var(--row);
+}
+
+.standings .rank,
+.standings thead .rank {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 4.5rem;
+  background: var(--bg);
+}
+
+.standings thead .rank {
+  z-index: 3;
+  background: var(--surface);
+}
+
+.standings tbody tr:nth-child(even) .rank {
+  background: var(--row);
+}
+
+.competitor {
+  min-width: 12rem;
+}
+
+.display-name,
+.comp-name {
+  display: block;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.competitor-id,
+.tie-break,
+.comp-meta,
+.result p {
+  margin: 0.15rem 0 0;
+}
+
+.total-points {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.empty-standings {
+  margin: 0;
+}
+
+.site-footer {
+  padding: 0 0 2.5rem;
+  color: var(--muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (forced-colors: active) {
+  .badge,
+  .notice,
+  .table-scroll {
+    border-color: CanvasText;
+  }
+}
+
+@media (max-width: 40rem) {
+  .site-header,
+  .contest-app,
+  .site-footer,
+  .contest-statement {
+    width: min(100% - 1.5rem, 72rem);
+  }
+
+  .standings {
+    font-size: 0.92rem;
+  }
+
+  .standings th,
+  .standings td {
+    padding: 0.55rem 0.6rem;
+  }
+}

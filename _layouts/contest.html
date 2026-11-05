@@ -1,0 +1,41 @@
+---
+---
+{% assign page_title = page.title | default: "Contest" %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title | escape }}</title>
+    <link rel="stylesheet" href="{{ '/30kaggle/src/contest.css' | relative_url }}">
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <p class="archive-link"><a href="{{ '/30kaggle/' | relative_url }}">30 Kaggle archive</a></p>
+      <h1>{{ page_title | escape }}</h1>
+    </header>
+    <main id="content">
+      <article class="contest-statement">
+        {{ content }}
+      </article>
+      {% unless page.archive %}
+      <section
+        id="contest-app"
+        class="contest-app"
+        data-manifest-url="manifest.json"
+        aria-busy="true"
+      >
+        <p>Loading contest status.</p>
+        <noscript><p>Contest standings need JavaScript enabled to load.</p></noscript>
+      </section>
+      {% endunless %}
+    </main>
+    <footer class="site-footer">
+      <p>Each contest page loads its own manifest and leaderboard. Live pages keep the last valid update if a refresh fails.</p>
+    </footer>
+    {% unless page.archive %}
+    <script src="{{ '/30kaggle/src/contest.js' | relative_url }}"></script>
+    {% endunless %}
+  </body>
+</html>
