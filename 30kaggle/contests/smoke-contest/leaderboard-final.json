@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "contest_id": "smoke-contest",
+  "status": "final",
+  "start_at": "2026-11-07T21:01:01Z",
+  "end_at": "2026-11-07T21:03:01Z",
+  "generated_at": "2026-11-07T21:03:02Z",
+  "source": {
+    "fresh": true,
+    "last_success_at": "2026-11-07T21:03:02Z",
+    "errors": []
+  },
+  "competitions": [
+    {
+      "slug": "digit-recognizer",
+      "weight": 1.0
+    }
+  ],
+  "standings": [
+    {
+      "rank": 1,
+      "competitor_id": "serzak",
+      "display_name": "SerZak",
+      "total_points": 1.0,
+      "entered_competitions": 1,
+      "placement_sum": 1,
+      "competitions": {
+        "digit-recognizer": {
+          "submitted": true,
+          "registered_rank": 1,
+          "kaggle_rank": 1161,
+          "score": 0.09896,
+          "points": 1.0
+        }
+      }
+    }
+  ],
+  "warnings": []
+}
