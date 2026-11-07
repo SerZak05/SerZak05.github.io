@@ -9,8 +9,5 @@ Open a contest for its statement, countdown, and leaderboard. Before the start t
 ## Contests
 
 <!-- contests:start -->
-<!-- Publisher: replace the placeholder below with one markdown link per contest. Keep these markers. -->
-
-No contests have been published yet.
-
+- [Smoke contest](contests/smoke-contest/) | live | 2026-11-07T21:01:01Z | 2026-11-07T21:03:01Z
 <!-- contests:end -->

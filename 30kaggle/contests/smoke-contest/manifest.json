@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "contest_id": "smoke-contest",
+  "name": "Smoke contest",
+  "status": "live",
+  "start_at": "2026-11-07T21:01:01Z",
+  "end_at": "2026-11-07T21:03:01Z",
+  "live_leaderboard_url": "https://mk2gj5-206-166-251-9.a.2na.am/leaderboard.json",
+  "final_leaderboard_url": "leaderboard-final.json"
+}
