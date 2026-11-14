@@ -3,8 +3,9 @@
 // Scheduled, live, finalizing, and final contest page.
 // Manifest times are authoritative for the countdown and for moving a
 // scheduled or live manifest forward. Final and finalizing manifest statuses
-// are never moved backward. Dynamic values are assigned with textContent
-// and createTextNode; tag names passed to createElement are fixed literals.
+// are never moved backward. The problem statement stays hidden until start.
+// Dynamic values are assigned with textContent and createTextNode; tag names
+// passed to createElement are fixed literals.
 
 const SCHEMA_VERSION = 1;
 const POLL_INTERVAL_MS = 15000;
@@ -501,7 +502,7 @@ function statusText(state) {
   const { phase, snapshot, liveOutage, manifestOutage, manifest } = state;
   let text;
   if (phase === "scheduled") {
-    text = "The contest has not started.";
+    text = "The contest has not started. Problems stay hidden until the start time.";
   } else if (phase === "live") {
     if (liveOutage && snapshot) {
       text = `The contest is live, but new results are unavailable. Showing the last valid update. ${liveOutage}`;
@@ -974,6 +975,7 @@ class ContestApp {
       await this.pollFinal(now);
     }
     const shown = viewPhase(phase, this.finalSnapshot);
+    this.syncStatement(shown);
     const snapshot = shown === "final" ? this.finalSnapshot : this.leaderboard;
     const fetchedAt = shown === "final" ? this.finalFetchedAt : this.leaderboardFetchedAt;
     const panelState = {
@@ -1005,6 +1007,14 @@ class ContestApp {
       return null;
     }
     return 1000;
+  }
+
+  syncStatement(phase) {
+    const statement = this.doc.getElementById("contest-statement");
+    if (!statement) {
+      return;
+    }
+    statement.hidden = phase === "scheduled";
   }
 
   due(last, now) {

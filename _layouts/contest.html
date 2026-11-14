@@ -16,7 +16,7 @@
       <h1>{{ page_title | escape }}</h1>
     </header>
     <main id="content">
-      <article class="contest-statement">
+      <article class="contest-statement" id="contest-statement"{% unless page.archive %} hidden{% endunless %}>
         {{ content }}
       </article>
       {% unless page.archive %}
@@ -27,7 +27,7 @@
         aria-busy="true"
       >
         <p>Loading contest status.</p>
-        <noscript><p>Contest standings need JavaScript enabled to load.</p></noscript>
+        <noscript><p>Problems and standings need JavaScript. Problems stay hidden until the contest has started.</p></noscript>
       </section>
       {% endunless %}
     </main>
