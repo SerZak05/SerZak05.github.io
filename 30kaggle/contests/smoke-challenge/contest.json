@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "contest_id": "smoke-challenge",
+  "name": "Smoke challenge",
+  "start_at": "2026-11-14T22:00:00Z",
+  "end_at": "2026-11-17T22:00:00Z",
+  "competitions": [
+    {
+      "slug": "nlp-getting-started",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/nlp-getting-started"
+    },
+    {
+      "slug": "open-cv-tf-project-1-image-classification-round-6",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/open-cv-tf-project-1-image-classification-round-6"
+    },
+    {
+      "slug": "churn-prediction-hse-cv-master",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/churn-prediction-hse-cv-master"
+    },
+    {
+      "slug": "olp-ai-mta-practice-1",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/olp-ai-mta-practice-1"
+    },
+    {
+      "slug": "contradictory-my-dear-watson",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/contradictory-my-dear-watson"
+    }
+  ]
+}
