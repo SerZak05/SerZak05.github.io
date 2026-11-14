@@ -1,0 +1,51 @@
+name: Update long contest leaderboards
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-long-contests
+  cancel-in-progress: false
+
+jobs:
+  update:
+    # Temporarily disabled. Keep the updater and workflow in place so periodic
+    # leaderboard publishing can be enabled later without reconstructing it.
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Kaggle CLI
+        run: python -m pip install kaggle
+
+      - name: Refresh all active contests
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+        run: python scripts/update_long_contests.py --repo "$GITHUB_WORKSPACE"
+
+      - name: Commit generated leaderboards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- 30kaggle/index.md 30kaggle/contests
+          if git diff --cached --quiet; then
+            echo "No leaderboard changes."
+            exit 0
+          fi
+          git commit -m "Update long contest leaderboards"
+          git push origin HEAD:master
