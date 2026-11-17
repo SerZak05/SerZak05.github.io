@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "contest_id": "getting-started",
+  "name": "Для начинающих",
+  "start_at": "2026-11-17T13:00:00Z",
+  "end_at": "2026-11-24T13:00:00Z",
+  "competitions": [
+    {
+      "slug": "titanic",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/titanic"
+    },
+    {
+      "slug": "spaceship-titanic",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/spaceship-titanic"
+    },
+    {
+      "slug": "house-prices-advanced-regression-techniques",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques"
+    },
+    {
+      "slug": "digit-recognizer",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/digit-recognizer"
+    },
+    {
+      "slug": "nlp-getting-started",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/nlp-getting-started"
+    },
+    {
+      "slug": "contradictory-my-dear-watson",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/contradictory-my-dear-watson"
+    },
+    {
+      "slug": "store-sales-time-series-forecasting",
+      "weight": 1.0,
+      "link": "https://www.kaggle.com/competitions/store-sales-time-series-forecasting"
+    }
+  ]
+}
