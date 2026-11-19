@@ -7,5 +7,5 @@ archive: true
 ## Контесты
 
 <!-- contests:start -->
-- [Для начинающих](contests/getting-started/) | scheduled | 2026-11-17T13:00:00Z | 2026-11-24T13:00:00Z
+- [Для начинающих](contests/getting-started/) | scheduled | 17.11.26 16:00:00 | 24.11.26 16:00:00
 <!-- contests:end -->

@@ -114,6 +114,8 @@ function requireStringList(value, field) {
   return value.map((item) => requireString(item, field));
 }
 
+const DISPLAY_OFFSET_MS = 3 * 60 * 60 * 1000;
+
 function formatUtc(date) {
   const pad = (part) => String(part).padStart(2, "0");
   return (
@@ -122,8 +124,14 @@ function formatUtc(date) {
   );
 }
 
-function displayUtc(date) {
-  return formatUtc(date).replace("T", " ").replace("Z", " UTC");
+function formatDisplay(date) {
+  const shifted = new Date(date.getTime() + DISPLAY_OFFSET_MS);
+  const pad = (part) => String(part).padStart(2, "0");
+  const year = String(shifted.getUTCFullYear()).slice(-2);
+  return (
+    `${pad(shifted.getUTCDate())}.${pad(shifted.getUTCMonth() + 1)}.${year} ` +
+    `${pad(shifted.getUTCHours())}:${pad(shifted.getUTCMinutes())}:${pad(shifted.getUTCSeconds())}`
+  );
 }
 
 function parseUtc(value, field) {
@@ -562,7 +570,7 @@ function countdownText(phase, manifest, now) {
   if (phase === "live") {
     return `Ends in ${formatDuration(manifest.endAt.getTime() - now.getTime())}.`;
   }
-  return `Ended at ${displayUtc(manifest.endAt)}.`;
+  return `Ended at ${formatDisplay(manifest.endAt)}.`;
 }
 
 function competitionLabel(competition) {
@@ -627,7 +635,7 @@ function el(doc, tag, props = {}) {
 
 function timeElement(doc, date) {
   return el(doc, "time", {
-    text: displayUtc(date),
+    text: formatDisplay(date),
     attrs: { datetime: formatUtc(date) },
   });
 }
@@ -1206,6 +1214,7 @@ globalThis.ContestApp = {
   cacheBustUrl,
   derivePhase,
   ensureDirectoryUrl,
+  formatDisplay,
   formatDuration,
   validateLeaderboard,
   validateManifest,
