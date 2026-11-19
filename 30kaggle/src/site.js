@@ -13,7 +13,12 @@ const REGISTRY_FIELDS = [
   "final_leaderboard_url",
   "url",
 ];
-const REGISTRY_GROUPS = ["scheduled", "live", "finalizing", "final"];
+const DISPLAY_OFFSET_MS = 3 * 60 * 60 * 1000;
+const ARCHIVE_GROUPS = [
+  { id: "scheduled", title: "Запланированные", statuses: ["scheduled"] },
+  { id: "live", title: "Текущие", statuses: ["live", "finalizing"] },
+  { id: "final", title: "Прошедшие", statuses: ["final"] },
+];
 
 function registryMapping(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -115,6 +120,20 @@ async function fetchRegistry(url, fetchImpl = (...args) => globalThis.fetch(...a
   return validateRegistry(await response.json());
 }
 
+function formatDisplay(value) {
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) {
+    throw new Error("contest timestamp is invalid");
+  }
+  const shifted = new Date(parsed + DISPLAY_OFFSET_MS);
+  const pad = (part) => String(part).padStart(2, "0");
+  const year = String(shifted.getUTCFullYear()).slice(-2);
+  return (
+    `${pad(shifted.getUTCDate())}.${pad(shifted.getUTCMonth() + 1)}.${year} ` +
+    `${pad(shifted.getUTCHours())}:${pad(shifted.getUTCMinutes())}:${pad(shifted.getUTCSeconds())}`
+  );
+}
+
 function contestLink(document, contest, registryUrl) {
   const item = document.createElement("li");
   const link = document.createElement("a");
@@ -122,32 +141,50 @@ function contestLink(document, contest, registryUrl) {
   link.textContent = contest.name;
   const dates = document.createElement("span");
   dates.className = "contest-dates";
-  dates.textContent = ` — ${contest.start_at} → ${contest.end_at}`;
+  dates.textContent = ` — ${formatDisplay(contest.start_at)} → ${formatDisplay(contest.end_at)}`;
   item.append(link, dates);
   return item;
 }
 
-function renderArchive(document, root, contests, registryUrl) {
-  const grouped = new Map(REGISTRY_GROUPS.map((status) => [status, []]));
-  for (const contest of contests) {
-    grouped.get(contest.status).push(contest);
-  }
+function renderSidebar(document, contests, registryUrl) {
+  const list = document.getElementById("contest-sidebar");
+  if (!list) return;
   const fragment = document.createDocumentFragment();
-  for (const status of REGISTRY_GROUPS) {
+  if (!contests.length) {
+    const empty = document.createElement("li");
+    empty.textContent = "Нет контестов.";
+    fragment.append(empty);
+  } else {
+    for (const contest of contests) {
+      const item = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = new URL(contest.url, registryUrl).href;
+      link.textContent = contest.name;
+      item.append(link);
+      fragment.append(item);
+    }
+  }
+  list.replaceChildren(fragment);
+  list.setAttribute("aria-busy", "false");
+}
+
+function renderArchive(document, root, contests, registryUrl) {
+  const fragment = document.createDocumentFragment();
+  for (const group of ARCHIVE_GROUPS) {
     const section = document.createElement("section");
-    section.id = status;
-    const title = document.createElement("h2");
-    title.textContent = status[0].toUpperCase() + status.slice(1);
+    section.id = group.id;
+    const title = document.createElement("h3");
+    title.textContent = group.title;
     const list = document.createElement("ul");
     list.className = "contest-list";
-    const entries = grouped.get(status);
+    const entries = contests.filter((contest) => group.statuses.includes(contest.status));
     if (entries.length) {
       for (const contest of entries) {
         list.append(contestLink(document, contest, registryUrl));
       }
     } else {
       const empty = document.createElement("li");
-      empty.textContent = "No contests.";
+      empty.textContent = "Нет контестов.";
       list.append(empty);
     }
     section.append(title, list);
@@ -157,30 +194,28 @@ function renderArchive(document, root, contests, registryUrl) {
   root.setAttribute("aria-busy", "false");
 }
 
-function updateNavigation(document, contests) {
-  for (const status of ["scheduled", "live"]) {
-    const link = document.querySelector(`[data-contest-nav="${status}"]`);
-    if (!link) continue;
-    const count = contests.filter((contest) => contest.status === status).length;
-    link.textContent = `${status[0].toUpperCase() + status.slice(1)} (${count})`;
-    link.setAttribute("aria-label", `${status} contests: ${count}`);
-  }
-}
-
 async function bootSite(document, fetchImpl) {
   const host = document.querySelector("[data-registry-url]");
   if (!host) return [];
   const registryUrl = new URL(host.getAttribute("data-registry-url"), document.baseURI).href;
   try {
     const contests = await fetchRegistry(registryUrl, fetchImpl);
-    updateNavigation(document, contests);
+    renderSidebar(document, contests, registryUrl);
     const archive = document.getElementById("contest-archive");
     if (archive) renderArchive(document, archive, contests, registryUrl);
     return contests;
   } catch (error) {
+    const sidebar = document.getElementById("contest-sidebar");
+    if (sidebar) {
+      sidebar.textContent = "";
+      const item = document.createElement("li");
+      item.textContent = "Список контестов не загрузился.";
+      sidebar.append(item);
+      sidebar.setAttribute("aria-busy", "false");
+    }
     const archive = document.getElementById("contest-archive");
     if (archive) {
-      archive.textContent = "Contest archive could not be loaded.";
+      archive.textContent = "Раздел контестов не загрузился.";
       archive.setAttribute("aria-busy", "false");
     }
     return [];
@@ -190,8 +225,9 @@ async function bootSite(document, fetchImpl) {
 globalThis.ThirtyKaggleSite = {
   bootSite,
   fetchRegistry,
+  formatDisplay,
   renderArchive,
-  updateNavigation,
+  renderSidebar,
   validateRegistry,
 };
 

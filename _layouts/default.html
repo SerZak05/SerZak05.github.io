@@ -18,18 +18,18 @@
           <a href="{{ '/30kaggle/' | relative_url }}">30kaggle</a>
         </h1>
         <p>{{ site.description }}</p>
-        <nav class="contest-nav" aria-label="Contest status">
-          <a
-            href="{{ '/30kaggle/#scheduled' | relative_url }}"
-            data-contest-nav="scheduled"
-          >Scheduled</a>
-          <a
-            href="{{ '/30kaggle/#live' | relative_url }}"
-            data-contest-nav="live"
-          >Live</a>
+        <nav class="contest-nav" aria-label="Контесты">
+          <ul id="contest-sidebar" class="contest-list" aria-busy="true">
+            <li>Загрузка контестов.</li>
+          </ul>
         </nav>
       </header>
       <section>
+        {% unless page.path == "30kaggle/index.md" %}
+        <p class="home-link">
+          <a href="{{ '/30kaggle/' | relative_url }}">На главную</a>
+        </p>
+        {% endunless %}
         {{ content }}
       </section>
       <footer>

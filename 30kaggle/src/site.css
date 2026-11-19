@@ -1,3 +1,7 @@
+.home-link {
+  margin-bottom: 1.5rem;
+}
+
 .site-brand {
   margin-bottom: 0.5rem;
 }
@@ -9,18 +13,22 @@
 }
 
 .contest-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
   margin-bottom: 1.5rem;
 }
 
-.contest-nav a {
-  font-weight: 600;
+header ul.contest-list {
+  position: static;
+  top: auto;
+  right: auto;
+  width: auto;
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
 }
 
-.contest-list {
-  padding-left: 1.25rem;
+.contest-list a {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
 }
 
 .contest-dates {
@@ -28,7 +36,18 @@
   font-size: 0.9em;
 }
 
+@media print, screen and (min-width: 961px) {
+  header {
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+  }
+}
+
 @media print, screen and (max-width: 960px) {
+  header {
+    padding-right: 0;
+  }
+
   .contest-nav {
     margin-bottom: 0;
   }
