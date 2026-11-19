@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "contests": [
+    {
+      "schema_version": 1,
+      "contest_id": "getting-started",
+      "name": "Для начинающих",
+      "status": "scheduled",
+      "start_at": "2026-11-17T13:00:00Z",
+      "end_at": "2026-11-24T13:00:00Z",
+      "live_leaderboard_url": "https://quick-bison-9269.a.tuna.free/getting-started/leaderboard.json",
+      "final_leaderboard_url": "leaderboard-final.json",
+      "url": "contests/getting-started/"
+    }
+  ]
+}

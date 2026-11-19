@@ -13,28 +13,28 @@
     <a class="skip-link" href="#content">Skip to content</a>
     <header class="site-header">
       <h1>{{ page_title | escape }}</h1>
+      <p class="archive-link">
+        <a href="{{ '/30kaggle/' | relative_url }}">All contests</a>
+      </p>
     </header>
     <main id="content">
-      <article class="contest-statement" id="contest-statement"{% unless page.archive %} hidden{% endunless %}>
+      <article class="contest-statement" id="contest-statement" hidden>
         {{ content }}
       </article>
-      {% unless page.archive %}
       <section
         id="contest-app"
         class="contest-app"
-        data-manifest-url="manifest.json"
+        data-contest-id="{{ page.contest_id | escape }}"
+        data-registry-url="{{ '/30kaggle/contests.json' | relative_url }}"
         aria-busy="true"
       >
         <p>Loading contest status.</p>
         <noscript><p>Problems and standings need JavaScript. Problems stay hidden until the contest has started.</p></noscript>
       </section>
-      {% endunless %}
     </main>
     <footer class="site-footer">
-      <p>Each contest page loads its own manifest and leaderboard. Live pages keep the last valid update if a refresh fails.</p>
+      <p>Захаров Сергей, 2026</p>
     </footer>
-    {% unless page.archive %}
     <script src="{{ '/30kaggle/src/contest.js' | relative_url }}"></script>
-    {% endunless %}
   </body>
 </html>

@@ -1,0 +1,35 @@
+.site-brand {
+  margin-bottom: 0.5rem;
+}
+
+.site-brand a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.contest-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.contest-nav a {
+  font-weight: 600;
+}
+
+.contest-list {
+  padding-left: 1.25rem;
+}
+
+.contest-dates {
+  color: #727272;
+  font-size: 0.9em;
+}
+
+@media print, screen and (max-width: 960px) {
+  .contest-nav {
+    margin-bottom: 0;
+  }
+}

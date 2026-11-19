@@ -1,8 +1,8 @@
 "use strict";
 
 // Scheduled, live, finalizing, and final contest page.
-// Manifest times are authoritative for the countdown and for moving a
-// scheduled or live manifest forward. Final and finalizing manifest statuses
+// Registry times are authoritative for the countdown and for moving a
+// scheduled or live contest forward. Final and finalizing statuses
 // are never moved backward. The problem statement stays hidden until start.
 // A valid live leaderboard is shown and stored in localStorage for that
 // contest. A failed live poll keeps the open tab's board, or shows the stored
@@ -27,6 +27,7 @@ const MANIFEST_FIELDS = [
   "live_leaderboard_url",
   "final_leaderboard_url",
 ];
+const REGISTRY_ENTRY_FIELDS = [...MANIFEST_FIELDS, "url"];
 const MANIFEST_STATUSES = new Set(["scheduled", "live", "finalizing", "final"]);
 const LEADERBOARD_STATUSES = new Set(["live", "final"]);
 
@@ -378,6 +379,47 @@ function validateManifest(data) {
   };
 }
 
+function validateRegistry(data) {
+  rejectUnknown(data, ["schema_version", "contests"], "registry");
+  requireSchemaVersion(required(data, "schema_version"));
+  const entries = required(data, "contests");
+  if (!Array.isArray(entries)) {
+    throw new ContractError("registry contests must be an array");
+  }
+  const contests = entries.map((entry) => {
+    rejectUnknown(entry, REGISTRY_ENTRY_FIELDS, "registry contest");
+    const url = required(entry, "url");
+    requireRelativeUrl(url, "url");
+    const manifestData = {};
+    for (const field of MANIFEST_FIELDS) {
+      manifestData[field] = required(entry, field);
+    }
+    const manifest = validateManifest(manifestData);
+    if (url !== `contests/${manifest.contestId}/`) {
+      throw new ContractError(
+        `registry URL for ${manifest.contestId} must match its contest_id`
+      );
+    }
+    return { ...manifest, url };
+  });
+  const ids = contests.map((contest) => contest.contestId);
+  if (new Set(ids).size !== ids.length) {
+    throw new ContractError("registry contest_id values must be unique");
+  }
+  return contests;
+}
+
+function selectContest(data, contestId) {
+  requireIdentifier(contestId, "page contest_id");
+  const contest = validateRegistry(data).find(
+    (entry) => entry.contestId === contestId
+  );
+  if (!contest) {
+    throw new ContractError(`contest ${contestId} is not in the registry`);
+  }
+  return contest;
+}
+
 function validateLeaderboard(data) {
   rejectUnknown(
     data,
@@ -602,7 +644,7 @@ function describeFetchError(error, target) {
   const name =
     target === "final"
       ? "permanent leaderboard"
-      : target === "manifest"
+      : target === "registry"
         ? "contest status"
         : "live leaderboard";
   if (status != null) {
@@ -914,10 +956,14 @@ class ContestApp {
     this.schedule = options.schedule || ((fn, ms) => setTimeout(fn, ms));
     this.cancel = options.cancel || ((id) => clearTimeout(id));
     this.pollIntervalMs = options.pollIntervalMs || POLL_INTERVAL_MS;
-    this.manifestUrl =
-      options.manifestUrl ||
-      (root.getAttribute && root.getAttribute("data-manifest-url")) ||
-      "manifest.json";
+    this.registryUrl =
+      options.registryUrl ||
+      (root.getAttribute && root.getAttribute("data-registry-url")) ||
+      "/30kaggle/contests.json";
+    this.contestId =
+      options.contestId ||
+      (root.getAttribute && root.getAttribute("data-contest-id"));
+    requireIdentifier(this.contestId, "page contest_id");
     const rawBase =
       options.baseUrl ||
       (this.doc && this.doc.baseURI) ||
@@ -1076,17 +1122,17 @@ class ContestApp {
 
   async refreshManifest(now) {
     this.lastManifestPollAt = now.getTime();
-    const url = cacheBustUrl(resolveUrl(this.manifestUrl, this.baseUrl), now.getTime());
+    const url = cacheBustUrl(resolveUrl(this.registryUrl, this.baseUrl), now.getTime());
     try {
       const data = await fetchJson(url, this.fetchImpl);
-      const manifest = validateManifest(data);
+      const manifest = selectContest(data, this.contestId);
       if (this.manifest && manifest.contestId !== this.manifest.contestId) {
         throw new ContractError("contest_id changed");
       }
       this.manifest = manifest;
       this.manifestOutage = null;
     } catch (error) {
-      this.manifestOutage = describeFetchError(error, "manifest");
+      this.manifestOutage = describeFetchError(error, "registry");
     }
   }
 
@@ -1218,4 +1264,6 @@ globalThis.ContestApp = {
   formatDuration,
   validateLeaderboard,
   validateManifest,
+  validateRegistry,
+  selectContest,
 };

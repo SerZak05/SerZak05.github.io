@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'ru-RU' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>{{ page.title | default: site.title | escape }}</title>
+    <meta name="description" content="{{ page.description | default: site.description | escape }}">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/30kaggle/src/site.css' | relative_url }}">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header
+        data-registry-url="{{ '/30kaggle/contests.json' | relative_url }}"
+      >
+        <h1 class="site-brand">
+          <a href="{{ '/30kaggle/' | relative_url }}">30kaggle</a>
+        </h1>
+        <p>{{ site.description }}</p>
+        <nav class="contest-nav" aria-label="Contest status">
+          <a
+            href="{{ '/30kaggle/#scheduled' | relative_url }}"
+            data-contest-nav="scheduled"
+          >Scheduled</a>
+          <a
+            href="{{ '/30kaggle/#live' | relative_url }}"
+            data-contest-nav="live"
+          >Live</a>
+        </nav>
+      </header>
+      <section>
+        {{ content }}
+      </section>
+      <footer>
+        <p>Захаров Сергей, 2026</p>
+      </footer>
+    </div>
+    <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
+    <script src="{{ '/30kaggle/src/site.js' | relative_url }}"></script>
+  </body>
+</html>
