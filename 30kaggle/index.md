@@ -1,12 +1,10 @@
 ---
 layout: contest
-title: 30 Kaggle archive
+title: 30 Kaggle contests
 archive: true
 ---
 
-Open a contest for its statement, countdown, and leaderboard. Before the start time the page counts down and keeps the problems hidden. During the contest it shows the problems and refreshes live standings. After the deadline it waits for the permanent final snapshot, then keeps those results.
-
-## Contests
+## Контесты
 
 <!-- contests:start -->
 - [Для начинающих](contests/getting-started/) | scheduled | 2026-11-17T13:00:00Z | 2026-11-24T13:00:00Z

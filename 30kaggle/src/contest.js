@@ -4,11 +4,16 @@
 // Manifest times are authoritative for the countdown and for moving a
 // scheduled or live manifest forward. Final and finalizing manifest statuses
 // are never moved backward. The problem statement stays hidden until start.
+// A valid live leaderboard is shown and stored in localStorage for that
+// contest. A failed live poll keeps the open tab's board, or shows the stored
+// board for that contest when the tab has none. A stored document that fails
+// validation or belongs to another contest is ignored.
 // Dynamic values are assigned with textContent and createTextNode; tag names
 // passed to createElement are fixed literals.
 
 const SCHEMA_VERSION = 1;
 const POLL_INTERVAL_MS = 15000;
+const LEADERBOARD_STORAGE_PREFIX = "30kaggle.leaderboard.";
 const UTC_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/;
 const ID_RE = /^[a-z0-9]+(?:[a-z0-9_-]*[a-z0-9])?$/;
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -479,6 +484,26 @@ function formatNumber(value) {
   return text === "-0" ? "0" : text;
 }
 
+function browserStorage() {
+  try {
+    const storage = globalThis.localStorage;
+    if (
+      storage &&
+      typeof storage.getItem === "function" &&
+      typeof storage.setItem === "function"
+    ) {
+      return storage;
+    }
+  } catch (error) {
+    return null;
+  }
+  return null;
+}
+
+function leaderboardStorageKey(contestId) {
+  return `${LEADERBOARD_STORAGE_PREFIX}${contestId}`;
+}
+
 function cacheBustUrl(href, nowMs) {
   const url = new URL(href);
   url.searchParams.set("t", String(nowMs));
@@ -893,6 +918,9 @@ class ContestApp {
       throw new Error("baseUrl is required");
     }
     this.baseUrl = ensureDirectoryUrl(rawBase);
+    this.storage = Object.prototype.hasOwnProperty.call(options, "storage")
+      ? options.storage
+      : browserStorage();
     this.running = false;
     this.started = false;
     this.inFlight = false;
@@ -1066,6 +1094,48 @@ class ContestApp {
     }
   }
 
+  rememberLeaderboard(data) {
+    const storage = this.storage;
+    if (!storage || typeof storage.setItem !== "function") {
+      return;
+    }
+    try {
+      storage.setItem(leaderboardStorageKey(this.manifest.contestId), JSON.stringify(data));
+    } catch (error) {
+      return;
+    }
+  }
+
+  recallLeaderboard() {
+    const storage = this.storage;
+    if (!storage || typeof storage.getItem !== "function") {
+      return;
+    }
+    let raw;
+    try {
+      raw = storage.getItem(leaderboardStorageKey(this.manifest.contestId));
+    } catch (error) {
+      return;
+    }
+    if (typeof raw !== "string" || raw === "") {
+      return;
+    }
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (error) {
+      return;
+    }
+    let snapshot;
+    try {
+      snapshot = validateLeaderboard(data);
+      this.assertMatchesContest(snapshot);
+    } catch (error) {
+      return;
+    }
+    this.leaderboard = snapshot;
+  }
+
   async pollLive(now) {
     this.lastLivePollAt = now.getTime();
     const url = cacheBustUrl(this.manifest.liveLeaderboardUrl, now.getTime());
@@ -1076,8 +1146,12 @@ class ContestApp {
       this.leaderboard = snapshot;
       this.leaderboardFetchedAt = now;
       this.liveOutage = null;
+      this.rememberLeaderboard(data);
     } catch (error) {
       this.liveOutage = describeFetchError(error, "live");
+      if (!this.leaderboard) {
+        this.recallLeaderboard();
+      }
     }
   }
 
