@@ -15,9 +15,9 @@ const REGISTRY_FIELDS = [
 ];
 const DISPLAY_OFFSET_MS = 3 * 60 * 60 * 1000;
 const ARCHIVE_GROUPS = [
-  { id: "scheduled", title: "Запланированные", statuses: ["scheduled"] },
-  { id: "live", title: "Текущие", statuses: ["live", "finalizing"] },
-  { id: "final", title: "Прошедшие", statuses: ["final"] },
+  { id: "scheduled", title: "Запланированные" },
+  { id: "live", title: "Текущие" },
+  { id: "final", title: "Прошедшие" },
 ];
 
 function registryMapping(value) {
@@ -79,14 +79,14 @@ function validateRegistryEntry(entry) {
     throw new Error(`contest url must be ${expectedUrl}`);
   }
   if (
-    (entry.status === "scheduled" || entry.status === "live") &&
+    entry.status === "not_finished" &&
     (typeof entry.live_leaderboard_url !== "string" ||
       !entry.live_leaderboard_url.startsWith("https://"))
   ) {
-    throw new Error("scheduled and live contests require a live URL");
+    throw new Error("not_finished contests require a live URL");
   }
-  if (entry.status === "final" && entry.live_leaderboard_url !== null) {
-    throw new Error("final contests must clear the live URL");
+  if (entry.status === "finished" && entry.live_leaderboard_url !== null) {
+    throw new Error("finished contests must clear the live URL");
   }
   return entry;
 }
@@ -168,7 +168,16 @@ function renderSidebar(document, contests, registryUrl) {
   list.setAttribute("aria-busy", "false");
 }
 
-function renderArchive(document, root, contests, registryUrl) {
+function displayGroup(contest, now) {
+  const time = now.getTime();
+  const start = Date.parse(contest.start_at);
+  const end = Date.parse(contest.end_at);
+  if (time < start) return "scheduled";
+  if (time >= end) return "final";
+  return "live";
+}
+
+function renderArchive(document, root, contests, registryUrl, now = new Date()) {
   const fragment = document.createDocumentFragment();
   for (const group of ARCHIVE_GROUPS) {
     const section = document.createElement("section");
@@ -177,7 +186,7 @@ function renderArchive(document, root, contests, registryUrl) {
     title.textContent = group.title;
     const list = document.createElement("ul");
     list.className = "contest-list";
-    const entries = contests.filter((contest) => group.statuses.includes(contest.status));
+    const entries = contests.filter((contest) => displayGroup(contest, now) === group.id);
     if (entries.length) {
       for (const contest of entries) {
         list.append(contestLink(document, contest, registryUrl));
@@ -200,9 +209,10 @@ async function bootSite(document, fetchImpl) {
   const registryUrl = new URL(host.getAttribute("data-registry-url"), document.baseURI).href;
   try {
     const contests = await fetchRegistry(registryUrl, fetchImpl);
+    const now = new Date();
     renderSidebar(document, contests, registryUrl);
     const archive = document.getElementById("contest-archive");
-    if (archive) renderArchive(document, archive, contests, registryUrl);
+    if (archive) renderArchive(document, archive, contests, registryUrl, now);
     return contests;
   } catch (error) {
     const sidebar = document.getElementById("contest-sidebar");
@@ -225,6 +235,7 @@ async function bootSite(document, fetchImpl) {
 globalThis.ThirtyKaggleSite = {
   bootSite,
   fetchRegistry,
+  displayGroup,
   formatDisplay,
   renderArchive,
   renderSidebar,
