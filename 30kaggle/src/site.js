@@ -1,7 +1,7 @@
 "use strict";
 
 const REGISTRY_SCHEMA_VERSION = 1;
-const REGISTRY_STATUSES = new Set(["scheduled", "live", "finalizing", "final"]);
+const REGISTRY_STATUSES = new Set(["not_finished", "finished"]);
 const REGISTRY_FIELDS = [
   "schema_version",
   "contest_id",

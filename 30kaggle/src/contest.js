@@ -1,9 +1,8 @@
 "use strict";
 
-// Scheduled, live, finalizing, and final contest page.
-// Registry times are authoritative for the countdown and for moving a
-// scheduled or live contest forward. Final and finalizing statuses
-// are never moved backward. The problem statement stays hidden until start.
+// Contest page. Registry times choose scheduled, live, or finalizing.
+// status finished means the permanent page has been saved and stays final.
+// The problem statement stays hidden until start.
 // A valid live leaderboard is shown and stored in localStorage for that
 // contest. A failed live poll keeps the open tab's board, or shows the stored
 // board for that contest when the tab has none. A stored document that fails
@@ -28,7 +27,7 @@ const MANIFEST_FIELDS = [
   "final_leaderboard_url",
 ];
 const REGISTRY_ENTRY_FIELDS = [...MANIFEST_FIELDS, "url"];
-const MANIFEST_STATUSES = new Set(["scheduled", "live", "finalizing", "final"]);
+const MANIFEST_STATUSES = new Set(["not_finished", "finished"]);
 const LEADERBOARD_STATUSES = new Set(["live", "final"]);
 
 class ContractError extends Error {
@@ -360,11 +359,11 @@ function validateManifest(data) {
     requireHttpsUrl(liveLeaderboardUrl, "live_leaderboard_url");
   }
   requireRelativeUrl(finalLeaderboardUrl, "final_leaderboard_url");
-  if ((status === "scheduled" || status === "live") && liveLeaderboardUrl === null) {
-    throw new ContractError("scheduled and live manifests require live_leaderboard_url");
+  if (status === "not_finished" && liveLeaderboardUrl === null) {
+    throw new ContractError("not_finished manifests require live_leaderboard_url");
   }
-  if (status === "final" && liveLeaderboardUrl !== null) {
-    throw new ContractError("a final manifest must not retain live_leaderboard_url");
+  if (status === "finished" && liveLeaderboardUrl !== null) {
+    throw new ContractError("a finished manifest must not retain live_leaderboard_url");
   }
   return {
     contestId,
@@ -483,11 +482,8 @@ function validateLeaderboard(data) {
 }
 
 function derivePhase(manifest, now) {
-  if (manifest.status === "final") {
+  if (manifest.status === "finished") {
     return "final";
-  }
-  if (manifest.status === "finalizing") {
-    return "finalizing";
   }
   const time = now.getTime();
   if (time >= manifest.endAt.getTime()) {
