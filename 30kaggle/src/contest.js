@@ -510,15 +510,15 @@ function formatDuration(ms) {
   const seconds = totalSeconds % 60;
   const parts = [];
   if (days) {
-    parts.push(`${days}d`);
+    parts.push(`${days} д`);
   }
   if (days || hours) {
-    parts.push(`${hours}h`);
+    parts.push(`${hours} ч`);
   }
   if (days || hours || minutes) {
-    parts.push(`${minutes}m`);
+    parts.push(`${minutes} мин`);
   }
-  parts.push(`${seconds}s`);
+  parts.push(`${seconds} с`);
   return parts.join(" ");
 }
 
@@ -573,42 +573,42 @@ function statusText(state) {
   const { phase, snapshot, liveOutage, manifestOutage, manifest } = state;
   let text;
   if (phase === "scheduled") {
-    text = "The contest has not started. Problems stay hidden until the start time.";
+    text = "Контест ещё не начался. Задачи скрыты до старта.";
   } else if (phase === "live") {
     if (liveOutage && snapshot) {
-      text = `The contest is live, but new results are unavailable. Showing the last valid update. ${liveOutage}`;
+      text = `Контест идёт, но новые результаты недоступны. Показано последнее корректное обновление. ${liveOutage}`;
     } else if (liveOutage) {
-      text = `The contest is live, but results are unavailable. ${liveOutage}`;
+      text = `Контест идёт, но результаты недоступны. ${liveOutage}`;
     } else if (snapshot && snapshot.source.fresh === false) {
-      text = "The contest is live, and the latest results are stale.";
+      text = "Контест идёт. Последние результаты устарели.";
     } else {
-      text = "The contest is live.";
+      text = "Контест идёт.";
     }
   } else if (phase === "finalizing") {
     text = snapshot
-      ? "The contest has ended. Final standings are being published. Showing the last valid update."
-      : "The contest has ended. Waiting for the permanent leaderboard.";
+      ? "Контест завершён. Итоги публикуются. Показано последнее корректное обновление."
+      : "Контест завершён. Ожидается итоговая таблица.";
   } else if (!snapshot) {
-    text = "The permanent leaderboard could not be loaded.";
+    text = "Итоговую таблицу не удалось загрузить.";
   } else if (snapshot.source.fresh === false) {
-    text = "These standings are the permanent final results, frozen from the last valid update.";
+    text = "Это итоговые результаты, зафиксированные по последнему корректному обновлению.";
   } else {
-    text = "These standings are the permanent final results.";
+    text = "Это итоговые результаты.";
   }
   if (manifestOutage && manifest) {
-    text += " Contest status could not be refreshed. Showing the last valid status.";
+    text += " Статус контеста не удалось обновить. Показан последний корректный статус.";
   }
   return text;
 }
 
 function countdownText(phase, manifest, now) {
   if (phase === "scheduled") {
-    return `Starts in ${formatDuration(manifest.startAt.getTime() - now.getTime())}.`;
+    return `Старт через ${formatDuration(manifest.startAt.getTime() - now.getTime())}.`;
   }
   if (phase === "live") {
-    return `Ends in ${formatDuration(manifest.endAt.getTime() - now.getTime())}.`;
+    return `До конца ${formatDuration(manifest.endAt.getTime() - now.getTime())}.`;
   }
-  return `Ended at ${formatDisplay(manifest.endAt)}.`;
+  return `Завершён ${formatDisplay(manifest.endAt)}.`;
 }
 
 function competitionLabel(competition) {
@@ -621,11 +621,11 @@ function competitionMeta(competition) {
     parts.push(competition.metric);
   }
   if (competition.scoreDirection === "maximize") {
-    parts.push("higher is better");
+    parts.push("чем больше, тем лучше");
   } else if (competition.scoreDirection === "minimize") {
-    parts.push("lower is better");
+    parts.push("чем меньше, тем лучше");
   }
-  parts.push(`weight ${formatNumber(competition.weight)}`);
+  parts.push(`вес ${formatNumber(competition.weight)}`);
   return parts.join(" · ");
 }
 
@@ -635,18 +635,18 @@ function describeFetchError(error, target) {
   }
   const status = error && Number.isInteger(error.status) ? error.status : null;
   if (target === "final" && status === 404) {
-    return "The permanent leaderboard is not available yet.";
+    return "Итоговая таблица ещё не опубликована.";
   }
   const name =
     target === "final"
-      ? "permanent leaderboard"
+      ? "итоговой таблицы"
       : target === "registry"
-        ? "contest status"
-        : "live leaderboard";
+        ? "статуса контеста"
+        : "текущей таблицы";
   if (status != null) {
-    return `The ${name} request failed (${status}).`;
+    return `Не удалось запросить ${name} (${status}).`;
   }
-  return `The ${name} request failed.`;
+  return `Не удалось запросить ${name}.`;
 }
 
 function el(doc, tag, props = {}) {
@@ -685,26 +685,29 @@ function labeledTime(doc, label, date) {
   return item;
 }
 
+function signedPoints(value) {
+  const text = formatNumber(value);
+  if (text === "—" || text.startsWith("-")) {
+    return text;
+  }
+  return `+${text}`;
+}
+
 function resultElement(doc, result) {
-  if (!result.submitted) {
-    return el(doc, "div", {
-      className: "result result-none",
-      children: [
-        el(doc, "p", { text: "No submission" }),
-        el(doc, "p", { text: "Points 0" }),
-      ],
-    });
+  if (!result || !result.submitted) {
+    return null;
   }
   const score = result.score === null ? "—" : formatNumber(result.score);
-  const place = result.registeredRank === null ? "—" : String(result.registeredRank);
-  const kaggleRank = result.kaggleRank === null ? "—" : String(result.kaggleRank);
-  return el(doc, "div", {
+  const sourceRank = result.kaggleRank === null ? "—" : String(result.kaggleRank);
+  const points = signedPoints(result.points);
+  return el(doc, "span", {
     className: "result",
     children: [
-      el(doc, "p", { text: `Place ${place}` }),
-      el(doc, "p", { text: `Kaggle rank ${kaggleRank}` }),
-      el(doc, "p", { text: `Score ${score}` }),
-      el(doc, "p", { text: `Points ${formatNumber(result.points)}` }),
+      el(doc, "span", { className: "result-score", text: score }),
+      el(doc, "span", { className: "result-sep", text: "/" }),
+      el(doc, "span", { className: "result-rank", text: sourceRank }),
+      el(doc, "span", { className: "result-sep", text: "/" }),
+      el(doc, "span", { className: "result-points", text: points }),
     ],
   });
 }
@@ -715,9 +718,9 @@ function standingsTable(doc, snapshot) {
   });
   const headRow = el(doc, "tr", {
     children: [
-      el(doc, "th", { className: "rank", text: "Rank", attrs: { scope: "col" } }),
-      el(doc, "th", { text: "Competitor", attrs: { scope: "col" } }),
-      el(doc, "th", { text: "Points", attrs: { scope: "col" } }),
+      el(doc, "th", { className: "rank", text: "Место", attrs: { scope: "col" } }),
+      el(doc, "th", { text: "Участник", attrs: { scope: "col" } }),
+      el(doc, "th", { text: "Очки", attrs: { scope: "col" } }),
     ],
   });
   for (const competition of snapshot.competitions) {
@@ -745,10 +748,6 @@ function standingsTable(doc, snapshot) {
           children: [
             el(doc, "p", { className: "display-name", text: standing.displayName }),
             el(doc, "p", { className: "competitor-id", text: standing.competitorId }),
-            el(doc, "p", {
-              className: "tie-break",
-              text: `Entered ${standing.enteredCompetitions}. Placement sum ${standing.placementSum}.`,
-            }),
           ],
         }),
         el(doc, "td", {
@@ -758,9 +757,11 @@ function standingsTable(doc, snapshot) {
       ],
     });
     for (const competition of snapshot.competitions) {
+      const result = resultElement(doc, standing.competitions[competition.slug]);
       row.append(
         el(doc, "td", {
-          children: [resultElement(doc, standing.competitions[competition.slug])],
+          className: result ? "result-cell" : "result-cell result-empty",
+          children: result ? [result] : [],
         })
       );
     }
@@ -775,7 +776,7 @@ function standingsTable(doc, snapshot) {
         children: [
           el(doc, "caption", {
             className: "visually-hidden",
-            text: "Overall rank, name, points, and per-competition place, score, and points.",
+            text: "Место, участник, сумма очков и по каждой задаче счёт, место на источнике и начисленные очки.",
           }),
           el(doc, "thead", { children: [headRow] }),
           body,
@@ -792,10 +793,10 @@ function renderPanel(doc, state) {
     el(doc, "p", { className: `badge badge-${phase}`, text: phaseLabel(phase) }),
   ];
   if (snapshot && snapshot.source.fresh === false) {
-    badges.push(el(doc, "p", { className: "badge badge-stale", text: "Stale" }));
+    badges.push(el(doc, "p", { className: "badge badge-stale", text: "Устарело" }));
   }
   if (phase === "live" && state.liveOutage) {
-    badges.push(el(doc, "p", { className: "badge badge-unavailable", text: "Unavailable" }));
+    badges.push(el(doc, "p", { className: "badge badge-unavailable", text: "Недоступно" }));
   }
   const children = [
     el(doc, "div", {
@@ -814,9 +815,9 @@ function renderPanel(doc, state) {
     el(doc, "p", {
       className: "contest-window",
       children: [
-        doc.createTextNode("Start "),
+        doc.createTextNode("Старт "),
         timeElement(doc, manifest.startAt),
-        doc.createTextNode(". End "),
+        doc.createTextNode(". Финиш "),
         timeElement(doc, manifest.endAt),
         doc.createTextNode("."),
       ],
@@ -826,39 +827,36 @@ function renderPanel(doc, state) {
     children.push(el(doc, "p", { className: "notice notice-info", text: finalOutage }));
   }
   if (snapshot) {
-    const meta = [labeledTime(doc, "Generated", snapshot.generatedAt)];
-    if (snapshot.source.lastSuccessAt) {
-      meta.push(labeledTime(doc, "Last successful refresh", snapshot.source.lastSuccessAt));
+    children.push(el(doc, "h2", { className: "standings-title", text: "Таблица", attrs: { id: "standings-title" } }));
+    if (snapshot.standings.length) {
+      children.push(standingsTable(doc, snapshot));
+      children.push(
+        el(doc, "p", {
+          className: "cell-legend",
+          text: "В ячейке: счёт / место на источнике / +очки. Пустая ячейка — посылки нет.",
+        })
+      );
     } else {
-      meta.push(el(doc, "li", { text: "No successful refresh recorded." }));
+      children.push(el(doc, "p", { className: "empty-standings", text: "В этом обновлении нет таблицы." }));
+    }
+    const meta = [labeledTime(doc, "Сформировано", snapshot.generatedAt)];
+    if (snapshot.source.lastSuccessAt) {
+      meta.push(labeledTime(doc, "Последнее успешное обновление", snapshot.source.lastSuccessAt));
+    } else {
+      meta.push(el(doc, "li", { text: "Успешных обновлений не было." }));
     }
     if (fetchedAt) {
-      meta.push(labeledTime(doc, "Received", fetchedAt));
+      meta.push(labeledTime(doc, "Получено", fetchedAt));
     }
     children.push(el(doc, "ul", { className: "meta-list", children: meta }));
     if (snapshot.source.errors.length) {
-      children.push(el(doc, "p", { className: "notice notice-stale", text: "Results are stale." }));
+      children.push(el(doc, "p", { className: "notice notice-stale", text: "Результаты устарели." }));
       children.push(
         el(doc, "ul", {
           className: "error-list",
           children: snapshot.source.errors.map((error) => el(doc, "li", { text: error })),
         })
       );
-    }
-    if (snapshot.warnings.length) {
-      children.push(el(doc, "p", { text: "Warnings" }));
-      children.push(
-        el(doc, "ul", {
-          className: "warning-list",
-          children: snapshot.warnings.map((warning) => el(doc, "li", { text: warning })),
-        })
-      );
-    }
-    children.push(el(doc, "h2", { className: "standings-title", text: "Standings", attrs: { id: "standings-title" } }));
-    if (snapshot.standings.length) {
-      children.push(standingsTable(doc, snapshot));
-    } else {
-      children.push(el(doc, "p", { className: "empty-standings", text: "No standings are available in this update." }));
     }
   }
   const panel = el(doc, "div", { className: "contest-panel", children });
@@ -880,7 +878,6 @@ function panelSignature(state) {
     generated: snapshot ? snapshot.generatedAtText : null,
     fresh: snapshot ? snapshot.source.fresh : null,
     errors: snapshot ? snapshot.source.errors : null,
-    warnings: snapshot ? snapshot.warnings : null,
     standings: snapshot
       ? snapshot.standings.map((standing) => ({
           rank: standing.rank,
@@ -896,10 +893,10 @@ function panelSignature(state) {
 }
 
 function phaseLabel(phase) {
-  if (phase === "scheduled") return "Scheduled";
-  if (phase === "live") return "Live";
-  if (phase === "finalizing") return "Finalizing";
-  return "Final";
+  if (phase === "scheduled") return "Запланирован";
+  if (phase === "live") return "Идёт";
+  if (phase === "finalizing") return "Подведение итогов";
+  return "Итог";
 }
 
 function renderFailure(doc, message) {
@@ -1018,7 +1015,7 @@ class ContestApp {
     } catch (error) {
       this.renderedSignature = null;
       this.countdownNode = null;
-      this.root.replaceChildren(renderFailure(this.doc, "Contest status could not be updated."));
+      this.root.replaceChildren(renderFailure(this.doc, "Не удалось обновить статус контеста."));
       this.root.setAttribute("aria-busy", "false");
       delay = 5000;
     } finally {
@@ -1040,7 +1037,7 @@ class ContestApp {
       this.renderedSignature = null;
       this.countdownNode = null;
       this.root.replaceChildren(
-        renderFailure(this.doc, this.manifestOutage || "Contest status could not be loaded.")
+        renderFailure(this.doc, this.manifestOutage || "Не удалось загрузить статус контеста.")
       );
       this.root.setAttribute("aria-busy", "false");
       return 5000;
@@ -1236,7 +1233,7 @@ function boot(document) {
   const app = new ContestApp(root);
   app.start().catch(() => {
     const message = document.createElement("p");
-    message.textContent = "Contest status could not be loaded.";
+    message.textContent = "Не удалось загрузить статус контеста.";
     root.replaceChildren(message);
   });
 }

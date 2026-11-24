@@ -1,8 +1,8 @@
 ---
 ---
-{% assign page_title = page.title | default: "Contest" %}
+{% assign page_title = page.title | default: "Контест" %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,11 +10,11 @@
     <link rel="stylesheet" href="{{ '/30kaggle/src/contest.css' | relative_url }}">
   </head>
   <body>
-    <a class="skip-link" href="#content">Skip to content</a>
+    <a class="skip-link" href="#content">К содержанию</a>
     <header class="site-header">
       <h1>{{ page_title | escape }}</h1>
       <p class="archive-link">
-        <a href="{{ '/30kaggle/' | relative_url }}">All contests</a>
+        <a href="{{ '/30kaggle/' | relative_url }}">Все контесты</a>
       </p>
     </header>
     <main id="content">
@@ -28,8 +28,8 @@
         data-registry-url="{{ '/30kaggle/contests.json' | relative_url }}"
         aria-busy="true"
       >
-        <p>Loading contest status.</p>
-        <noscript><p>Problems and standings need JavaScript. Problems stay hidden until the contest has started.</p></noscript>
+        <p>Загрузка статуса контеста.</p>
+        <noscript><p>Задачи и таблица требуют JavaScript. Задачи скрыты, пока контест не начался.</p></noscript>
       </section>
     </main>
     <footer class="site-footer">

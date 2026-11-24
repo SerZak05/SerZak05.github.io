@@ -218,17 +218,22 @@ a:hover {
 
 .contest-window,
 .meta-list,
-.tie-break,
+.cell-legend,
 .competitor-id,
-.comp-meta {
+.comp-meta,
+.result-sep {
   color: var(--muted);
 }
 
 .meta-list,
-.warning-list,
 .error-list {
   margin: 0;
   padding-left: 1.2rem;
+}
+
+.cell-legend {
+  margin: 0;
+  font-size: 0.92rem;
 }
 
 .notice {
@@ -278,7 +283,7 @@ a:hover {
 .standings td {
   padding: 0.7rem 0.8rem;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
   border-bottom: 1px solid var(--border);
 }
 
@@ -287,6 +292,11 @@ a:hover {
   top: 0;
   z-index: 2;
   background: var(--surface);
+  text-align: center;
+}
+
+.standings thead th:nth-child(2) {
+  text-align: left;
 }
 
 .standings tbody tr:nth-child(even) {
@@ -312,7 +322,14 @@ a:hover {
 }
 
 .competitor {
-  min-width: 12rem;
+  min-width: 9rem;
+}
+
+.standings .rank,
+.total-points,
+.result-cell {
+  text-align: center;
+  white-space: nowrap;
 }
 
 .display-name,
@@ -323,15 +340,24 @@ a:hover {
 }
 
 .competitor-id,
-.tie-break,
-.comp-meta,
-.result p {
+.comp-meta {
   margin: 0.15rem 0 0;
+}
+
+.result {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.12rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-points {
+  font-weight: 700;
+  color: var(--live);
 }
 
 .total-points {
   font-weight: 700;
-  white-space: nowrap;
 }
 
 .empty-standings {
@@ -361,6 +387,10 @@ a:hover {
   .notice,
   .table-scroll {
     border-color: CanvasText;
+  }
+
+  .result-points {
+    color: CanvasText;
   }
 }
 
