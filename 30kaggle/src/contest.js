@@ -910,16 +910,16 @@ function renderFailure(doc, message) {
   });
 }
 
-async function fetchJson(url, fetchImpl, extraHeaders) {
+async function fetchJson(url, fetchImpl, credentialsMode) {
   let response;
   try {
     response = await fetchImpl(url, {
       method: "GET",
       cache: "no-store",
-      credentials: "omit",
+      credentials: credentialsMode || "omit",
       redirect: "follow",
       referrerPolicy: "no-referrer",
-      headers: { Accept: "application/json", ...(extraHeaders || {}) },
+      headers: { Accept: "application/json" },
     });
   } catch (error) {
     const wrapped = new Error("The request failed.");
@@ -1190,9 +1190,7 @@ class ContestApp {
     this.lastLivePollAt = now.getTime();
     const url = cacheBustUrl(this.manifest.liveLeaderboardUrl, now.getTime());
     try {
-      const data = await fetchJson(url, this.fetchImpl, {
-        "tuna-skip-browser-warning": "1",
-      });
+      const data = await fetchJson(url, this.fetchImpl, "include");
       const snapshot = validateLeaderboard(data);
       this.assertMatchesContest(snapshot);
       this.leaderboard = snapshot;
