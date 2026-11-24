@@ -910,7 +910,7 @@ function renderFailure(doc, message) {
   });
 }
 
-async function fetchJson(url, fetchImpl) {
+async function fetchJson(url, fetchImpl, extraHeaders) {
   let response;
   try {
     response = await fetchImpl(url, {
@@ -919,7 +919,7 @@ async function fetchJson(url, fetchImpl) {
       credentials: "omit",
       redirect: "follow",
       referrerPolicy: "no-referrer",
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json", ...(extraHeaders || {}) },
     });
   } catch (error) {
     const wrapped = new Error("The request failed.");
@@ -1190,7 +1190,9 @@ class ContestApp {
     this.lastLivePollAt = now.getTime();
     const url = cacheBustUrl(this.manifest.liveLeaderboardUrl, now.getTime());
     try {
-      const data = await fetchJson(url, this.fetchImpl);
+      const data = await fetchJson(url, this.fetchImpl, {
+        "tuna-skip-browser-warning": "1",
+      });
       const snapshot = validateLeaderboard(data);
       this.assertMatchesContest(snapshot);
       this.leaderboard = snapshot;
