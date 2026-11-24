@@ -22,6 +22,17 @@
       "live_leaderboard_url": "https://quick-bison-9269.a.tuna.free/linear-head-transfer/leaderboard.json",
       "final_leaderboard_url": "leaderboard-final.json",
       "url": "contests/linear-head-transfer/"
+    },
+    {
+      "schema_version": 1,
+      "contest_id": "simple-tabular",
+      "name": "Простой классический табличный ML",
+      "status": "not_finished",
+      "start_at": "2026-11-24T14:00:00Z",
+      "end_at": "2026-12-08T15:00:00Z",
+      "live_leaderboard_url": "https://quick-bison-9269.a.tuna.free/simple-tabular/leaderboard.json",
+      "final_leaderboard_url": "leaderboard-final.json",
+      "url": "contests/simple-tabular/"
     }
   ]
 }
