@@ -11,6 +11,17 @@
       "live_leaderboard_url": "https://quick-bison-9269.a.tuna.free/getting-started/leaderboard.json",
       "final_leaderboard_url": "leaderboard-final.json",
       "url": "contests/getting-started/"
+    },
+    {
+      "schema_version": 1,
+      "contest_id": "linear-head-transfer",
+      "name": "Перенос обучения с линейной головой",
+      "status": "not_finished",
+      "start_at": "2026-11-24T13:00:00Z",
+      "end_at": "2026-12-08T15:00:00Z",
+      "live_leaderboard_url": "https://quick-bison-9269.a.tuna.free/linear-head-transfer/leaderboard.json",
+      "final_leaderboard_url": "leaderboard-final.json",
+      "url": "contests/linear-head-transfer/"
     }
   ]
 }
